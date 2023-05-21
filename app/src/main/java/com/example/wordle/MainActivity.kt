@@ -124,14 +124,17 @@ class MainActivity : AppCompatActivity() {
             chosenWord = wordsOfLength.random()
         }
 
-        for ((key, button) in keyToButton) {
+        var stopInputs = false
+        for ((key, button) in keyToButton)
             button.setOnClickListener {
+                if (stopInputs) {
+                    return@setOnClickListener
+                }
                 if (inputLen == wordLength) {
                     if (key == "?") {
                         // not valid word
                         if (!wordsOfLength.contains(inputString.joinToString(separator = ""))) {
-                            Toast.makeText(this, "that's not a word, idiot", Toast.LENGTH_SHORT)
-                                .show()
+                            Toast.makeText(this, "that's not a word, idiot", Toast.LENGTH_SHORT).show()
                             return@setOnClickListener
                         }
 
@@ -174,15 +177,18 @@ class MainActivity : AppCompatActivity() {
 
                         if (allCorrect) {
                             // Won
+                            stopInputs = true
                             Toast.makeText(this, "wow", Toast.LENGTH_LONG).show()
                             Timer().schedule(5000) {
                                 newGame()
+                                stopInputs = false
                             }
                             return@setOnClickListener
                         }
 
                         if (rowNum + 1 == maxGuesses) {
                             // Out of guesses
+                            stopInputs = true
                             Toast.makeText(
                                 this,
                                 "you're so bad, it was $chosenWord",
@@ -190,6 +196,7 @@ class MainActivity : AppCompatActivity() {
                             ).show()
                             Timer().schedule(5000) {
                                 newGame()
+                                stopInputs = false
                             }
                             return@setOnClickListener
                         }
@@ -213,7 +220,6 @@ class MainActivity : AppCompatActivity() {
                     inputString[inputLen] = null
                 }
             }
-        }
     }
     private fun menu(words: List<String>) {
         supportActionBar?.hide()
